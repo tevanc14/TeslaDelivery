@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 
+from datetime import date
 from pyppeteer import launch
 
 with open(os.path.join(os.path.dirname(__file__), "config.json"), "r") as config_file:
@@ -20,16 +21,20 @@ async def main():
     browser = await launch()
     page = await browser.newPage()
     await page.goto(config["url"])
+
+    await page.waitForSelector(selectors["username"], timeout=20000)
     await page.type(selectors["username"], config["username"])
     await page.type(selectors["password"], config["password"])
     await page.click(selectors["login"])
+    
     await page.waitForSelector(selectors["my_order"], timeout=20000)
     await page.goto(config["url"])
+    
     await page.waitForSelector(selectors["delivery_date"], timeout=20000)
     delivery_date = await page.evaluate(
         f"""document.querySelector("{selectors["delivery_date"]}").innerText"""
     )
-    os.system(f"osascript -e 'display alert \"{delivery_date}\"'")
+    os.system(f"osascript -e 'display alert \"{date.today()}\n{delivery_date}\"'")
     await browser.close()
 
 
