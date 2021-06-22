@@ -34,8 +34,14 @@ async def main():
     delivery_date = await page.evaluate(
         f"""document.querySelector("{selectors["delivery_date"]}").innerText"""
     )
-    os.system(f"osascript -e 'display alert \"{date.today()}\n{delivery_date}\"'")
     await browser.close()
+
+    alert_text = f"{date.today()}\n{delivery_date}"
+
+    with open("output.log", "a") as output_file:
+        output_file.write(alert_text)
+
+    os.system(f"osascript -e 'display alert \"{alert_text}\"'")
 
 
 if __name__ == "__main__":
