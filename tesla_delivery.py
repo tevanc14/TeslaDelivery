@@ -26,10 +26,10 @@ async def main():
     await page.type(selectors["username"], config["username"])
     await page.type(selectors["password"], config["password"])
     await page.click(selectors["login"])
-    
+
     await page.waitForSelector(selectors["my_order"], timeout=20000)
     await page.goto(config["url"])
-    
+
     await page.waitForSelector(selectors["delivery_date"], timeout=20000)
     delivery_date = await page.evaluate(
         f"""document.querySelector("{selectors["delivery_date"]}").innerText"""
@@ -38,8 +38,8 @@ async def main():
 
     alert_text = f"{date.today()}\n{delivery_date}"
 
-    with open("output.log", "a") as output_file:
-        output_file.write(alert_text)
+    with open(os.path.join(os.path.dirname(__file__), "output.log"), "a") as output_file:
+        output_file.write(f"{alert_text}\n")
 
     os.system(f"osascript -e 'display alert \"{alert_text}\"'")
 
