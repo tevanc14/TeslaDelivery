@@ -1,9 +1,12 @@
 import asyncio
 import json
 import os
+import time
 
 from datetime import date
 from pyppeteer import launch
+
+timeout = 60000
 
 with open(os.path.join(os.path.dirname(__file__), "config.json"), "r") as config_file:
     config = json.loads(config_file.read())
@@ -18,19 +21,22 @@ selectors = {
 
 
 async def main():
-    browser = await launch()
+    browser = await launch(headless=False)
     page = await browser.newPage()
-    await page.goto(config["url"])
+    await page.goto(config["url"], timeout=timeout)
 
-    await page.waitForSelector(selectors["username"], timeout=20000)
+    await page.waitForSelector(selectors["username"], timeout=timeout)
+    time.sleep(2)
     await page.type(selectors["username"], config["username"])
+    time.sleep(2)
     await page.type(selectors["password"], config["password"])
+    time.sleep(2)
     await page.click(selectors["login"])
 
-    await page.waitForSelector(selectors["my_order"], timeout=20000)
+    await page.waitForSelector(selectors["my_order"], timeout=timeout)
     await page.goto(config["url"])
 
-    await page.waitForSelector(selectors["delivery_date"], timeout=20000)
+    await page.waitForSelector(selectors["delivery_date"], timeout=timeout)
     delivery_date = await page.evaluate(
         f"""document.querySelector("{selectors["delivery_date"]}").innerText"""
     )
